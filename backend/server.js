@@ -1,5 +1,4 @@
 import express from "express";
-import cors from "cors";
 import dotenv from "dotenv";
 
 import authRoutes from "./routes/auth.js";
@@ -15,14 +14,37 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+
 /* ===============================
-   CONFIG CORS (MUY IMPORTANTE)
+   CONFIG CORS
 ================================ */
-app.use(cors({
-  origin: "https://creative-marigold-466670.netlify.app",
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  credentials: true
-}));
+
+app.use((req, res, next) => {
+
+  res.header(
+    "Access-Control-Allow-Origin",
+    "https://creative-marigold-466670.netlify.app"
+  );
+
+  res.header(
+    "Access-Control-Allow-Methods",
+    "GET,POST,PUT,DELETE,OPTIONS"
+  );
+
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
+
+  res.header("Access-Control-Allow-Credentials", "true");
+
+  // Preflight
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+
+  next();
+});
 
 app.use(express.json());
 
@@ -30,11 +52,15 @@ app.use(express.json());
 /* ===============================
    WHATSAPP CONFIG
 ================================ */
+
 const client = new Client({
   authStrategy: new LocalAuth(),
+
   qrMaxRetries: 10,
+
   puppeteer: {
     headless: true,
+
     args: [
       "--no-sandbox",
       "--disable-setuid-sandbox",
@@ -44,28 +70,33 @@ const client = new Client({
   }
 });
 
+
 client.on("qr", (qr) => {
   console.log("⚠️ Escanea el QR:");
   qrcode.generate(qr, { small: true });
 });
 
+
 client.on("ready", () => {
   console.log("✅ WhatsApp conectado");
 });
+
 
 client.on("disconnected", (reason) => {
   console.log("❌ Desconectado:", reason);
   client.initialize();
 });
 
-client.initialize().catch(err =>
-  console.error("Error WhatsApp:", err)
-);
+
+client.initialize().catch(err => {
+  console.error("Error WhatsApp:", err);
+});
 
 
 /* ===============================
-   RUTAS
+   ROUTES
 ================================ */
+
 app.use("/api/auth", authRoutes);
 app.use("/api/lotes", lotesRoutes);
 
@@ -73,6 +104,7 @@ app.use("/api/lotes", lotesRoutes);
 /* ===============================
    WHATSAPP ENDPOINT
 ================================ */
+
 app.post("/api/whatsapp/notificar", async (req, res) => {
 
   const {
@@ -84,6 +116,7 @@ app.post("/api/whatsapp/notificar", async (req, res) => {
     lote
   } = req.body;
 
+
   try {
 
     if (!client?.info?.wid) {
@@ -92,6 +125,7 @@ app.post("/api/whatsapp/notificar", async (req, res) => {
         message: "WhatsApp no está listo"
       });
     }
+
 
     const mensaje = `
 🔔 NUEVA CITA
@@ -103,16 +137,25 @@ app.post("/api/whatsapp/notificar", async (req, res) => {
 📅 Fecha: ${fecha_cita || "Pendiente"}
 `;
 
+
     const numero = telefonoJefe || "573204838819";
     const chatId = `${numero}@c.us`;
 
+
     await client.sendMessage(chatId, mensaje);
+
 
     res.json({ success: true });
 
-  } catch (err) {
-    console.error(err);
-    res.json({ success: false });
+
+  } catch (error) {
+
+    console.error("Error WhatsApp:", error);
+
+    res.status(500).json({
+      success: false,
+      error: "Error enviando mensaje"
+    });
   }
 });
 
@@ -120,8 +163,10 @@ app.post("/api/whatsapp/notificar", async (req, res) => {
 /* ===============================
    START SERVER
 ================================ */
+
 app.listen(PORT, () => {
   console.log(`🚀 Servidor activo en puerto ${PORT}`);
 });
+
 
 export { client };
