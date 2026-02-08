@@ -13,40 +13,28 @@ import qrcode from "qrcode-terminal";
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3001;
-
+const PORT = process.env.PORT || 10000;
 
 /* ===============================
-   CORS CONFIG (CORRECTO)
+   🔥 CORS GLOBAL (ANTES DE TODO)
 ================================ */
 
 app.use(cors({
-  origin: [
-    "https://creative-marigold-466670.netlify.app"
-  ],
+  origin: "https://creative-marigold-466670.netlify.app",
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true
+  credentials: false
 }));
 
-// 🔥 PRE-FLIGHT GLOBAL (OBLIGATORIO)
+// Preflight
 app.options("*", cors());
 
 
 /* ===============================
-   BODY PARSER
+   BODY
 ================================ */
 
 app.use(express.json());
-
-
-/* ===============================
-   TEST ENDPOINT
-================================ */
-
-app.get("/ping", (req, res) => {
-  res.json({ ok: true });
-});
 
 
 /* ===============================
@@ -56,11 +44,8 @@ app.get("/ping", (req, res) => {
 const client = new Client({
   authStrategy: new LocalAuth(),
 
-  qrMaxRetries: 10,
-
   puppeteer: {
     headless: true,
-
     args: [
       "--no-sandbox",
       "--disable-setuid-sandbox",
@@ -102,71 +87,20 @@ app.use("/api/lotes", lotesRoutes);
 
 
 /* ===============================
-   WHATSAPP ENDPOINT
+   TEST
 ================================ */
 
-app.post("/api/whatsapp/notificar", async (req, res) => {
-
-  const {
-    cliente,
-    telefono_prospecto,
-    proyecto,
-    fecha_cita,
-    telefonoJefe,
-    lote
-  } = req.body;
-
-
-  try {
-
-    if (!client?.info?.wid) {
-      return res.json({
-        success: false,
-        message: "WhatsApp no está listo"
-      });
-    }
-
-
-    const mensaje = `
-🔔 NUEVA CITA
-
-👤 Cliente: ${cliente}
-📞 Teléfono: ${telefono_prospecto || "N/A"}
-🏗️ Proyecto: ${proyecto}
-📍 Lote: ${lote || "N/A"}
-📅 Fecha: ${fecha_cita || "Pendiente"}
-`;
-
-
-    const numero = telefonoJefe || "573204838819";
-    const chatId = `${numero}@c.us`;
-
-
-    await client.sendMessage(chatId, mensaje);
-
-
-    res.json({ success: true });
-
-
-  } catch (error) {
-
-    console.error("Error WhatsApp:", error);
-
-    res.status(500).json({
-      success: false,
-      error: "Error enviando mensaje"
-    });
-  }
+app.get("/ping", (req, res) => {
+  res.json({ ok: true });
 });
 
 
 /* ===============================
-   START SERVER
+   SERVER
 ================================ */
 
 app.listen(PORT, () => {
-  console.log(`🚀 Servidor activo en puerto ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
-
 
 export { client };
