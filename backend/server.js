@@ -15,8 +15,9 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+
 /* ===============================
-   CORS CONFIG (RENDER + NETLIFY)
+   CORS CONFIG (CORRECTO)
 ================================ */
 
 app.use(cors({
@@ -25,20 +26,27 @@ app.use(cors({
   ],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: false
+  credentials: true
 }));
 
-// Preflight fix (IMPORTANTE)
+// 🔥 PRE-FLIGHT GLOBAL (OBLIGATORIO)
 app.options("*", cors());
 
-app.use((req, res, next) => {
-  if (req.method === "OPTIONS") {
-    return res.sendStatus(200);
-  }
-  next();
-});
+
+/* ===============================
+   BODY PARSER
+================================ */
 
 app.use(express.json());
+
+
+/* ===============================
+   TEST ENDPOINT
+================================ */
+
+app.get("/ping", (req, res) => {
+  res.json({ ok: true });
+});
 
 
 /* ===============================
