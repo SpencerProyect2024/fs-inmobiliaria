@@ -1,5 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
+import cors from "cors";
 
 import authRoutes from "./routes/auth.js";
 import lotesRoutes from "./routes/lotes.js";
@@ -12,39 +13,21 @@ import qrcode from "qrcode-terminal";
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 10000;
 
 
 /* ===============================
    CONFIG CORS
 ================================ */
 
-app.use((req, res, next) => {
+app.use(cors({
+  origin: "https://creative-marigold-466670.netlify.app",
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true
+}));
 
-  res.header(
-    "Access-Control-Allow-Origin",
-    "https://creative-marigold-466670.netlify.app"
-  );
-
-  res.header(
-    "Access-Control-Allow-Methods",
-    "GET,POST,PUT,DELETE,OPTIONS"
-  );
-
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-  );
-
-  res.header("Access-Control-Allow-Credentials", "true");
-
-  // Preflight
-  if (req.method === "OPTIONS") {
-    return res.sendStatus(200);
-  }
-
-  next();
-});
+app.options("*", cors());
 
 app.use(express.json());
 
