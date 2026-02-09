@@ -20,24 +20,18 @@ const PORT = process.env.PORT || 10000;
 ================================ */
 
 app.use(cors({
-  origin: function (origin, callback) {
-    // Permitir si no hay origen (como Postman) o si viene de Vercel o Netlify
-    if (!origin || 
-        origin.includes('vercel.app') || 
-        origin.includes('netlify.app') || 
-        origin === "https://fs-inmobiliaria.vercel.app") {
-      callback(null, true);
-    } else {
-      callback(new Error('No permitido por CORS'));
-    }
-  },
+  origin: '*', 
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true
+  allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
-// Esto es vital para las "Preflight requests"
-app.options("*", cors());
+// ESTO ES LO MÁS IMPORTANTE: Agrégalo justo debajo del app.use(cors...)
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  next();
+});
 
 
 /* ===============================
