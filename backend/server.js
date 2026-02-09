@@ -5,10 +5,10 @@ import cors from "cors";
 import authRoutes from "./routes/auth.js";
 import lotesRoutes from "./routes/lotes.js";
 
-import pkg from "whatsapp-web.js";
-const { Client, LocalAuth } = pkg;
+//import pkg from "whatsapp-web.js";
+//const { Client, LocalAuth } = pkg;
 
-import qrcode from "qrcode-terminal";
+//import qrcode from "qrcode-terminal";
 
 dotenv.config();
 
@@ -20,7 +20,7 @@ const PORT = process.env.PORT || 10000;
 ================================ */
 
 app.use(cors({
-  origin: '*', 
+  origin: ['https://tu-frontend-vercel.app', 'http://localhost:5173'],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
@@ -45,7 +45,7 @@ app.use(express.json());
    WHATSAPP CONFIG
 ================================ */
 
-const client = new Client({
+/*const client = new Client({
     authStrategy: new LocalAuth({ clientId: "fs_inmobiliaria_session" }),
     puppeteer: {
         headless: true,
@@ -118,7 +118,7 @@ client.on("disconnected", (reason) => {
 
 client.initialize().catch(err => {
   console.error("Error WhatsApp:", err);
-});
+});*/
 
 
 /* ===============================
