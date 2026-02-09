@@ -46,24 +46,42 @@ app.use(express.json());
 ================================ */
 
 const client = new Client({
-    authStrategy: new LocalAuth(),
+    authStrategy: new LocalAuth({
+        clientId: "client-one" // Esto ayuda a separar sesiones
+    }),
     puppeteer: {
-        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        headless: true,
+        args: [
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
+            '--disable-gpu',
+            '--no-first-run',
+            '--no-zygote',
+            '--single-process'
+        ]
     }
 });
 
-// ESTO ES LO QUE DEBES AGREGAR:
-client.on('qr', (qr) => {
-    // Ya no necesitamos el QR, pero lo dejamos por si acaso
-    console.log('QR RECIBIDO, pero usaremos código de emparejamiento...');
+// USAMOS EL EVENTO QR PARA PEDIR EL CÓDIGO SOLO CUANDO EL NAVEGADOR ESTÉ LISTO
+client.on('qr', async (qr) => {
+    console.log('--- NAVEGADOR LISTO, GENERANDO CÓDIGO ---');
+    try {
+        // REEMPLAZA ESTO CON TU NÚMERO REAL
+        const pairingCode = await client.requestPairingCode('5491100000000'); 
+        console.log('****************************************');
+        console.log('TU CÓDIGO DE VINCULACIÓN ES:', pairingCode);
+        console.log('****************************************');
+    } catch (err) {
+        console.log('Error al generar código, reintentando...');
+    }
 });
 
-// Lógica para generar el código de 8 dígitos
 client.on('ready', () => {
     console.log('✅ WhatsApp conectado correctamente');
 });
 
-client.initialize();
+client.initialize().catch(err => console.error("Error al inicializar:", err));
 
 // AGREGA ESTO AL FINAL O DESPUÉS DE INITIALIZE
 // Sustituye 'tu_numero' por tu número con código de país (ej: 54911...)
