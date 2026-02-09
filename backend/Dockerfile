@@ -5,13 +5,21 @@ WORKDIR /app
 
 # Copiamos el package.json desde la raíz
 COPY package*.json ./
+# Aseguramos permisos
+RUN chown -R pptruser:pptruser /app
 
 # Instalamos librerías
+COPY package*.json ./
 RUN npm install
 
 # ¡ESTA ES LA LÍNEA CLAVE! 
 # Copia el CONTENIDO de backend directamente a /app
 COPY backend/. .
+
+# Forzamos el uso del Chrome instalado en la imagen
+
+ENV PUPPETEER_SKIP_DOWNLOAD=true
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable
 
 EXPOSE 10000
 
