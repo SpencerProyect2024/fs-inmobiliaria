@@ -42,19 +42,21 @@ app.use(express.json());
 ================================ */
 
 const client = new Client({
-  authStrategy: new LocalAuth(),
-
+  // Quita LocalAuth momentáneamente para que el QR salga sin pesar tanto
   puppeteer: {
     headless: true,
     args: [
       "--no-sandbox",
       "--disable-setuid-sandbox",
       "--disable-dev-shm-usage",
+      "--disable-accelerated-2d-canvas",
+      "--no-first-run",
+      "--no-zygote",
+      "--single-process", // ESTO ES VITAL para ahorrar RAM en Render
       "--disable-gpu"
     ]
   }
 });
-
 
 client.on("qr", (qr) => {
   console.log("⚠️ Escanea el QR:");
