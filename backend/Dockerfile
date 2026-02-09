@@ -3,16 +3,17 @@ FROM ghcr.io/puppeteer/puppeteer:latest
 USER root
 WORKDIR /app
 
-# Subimos un nivel para copiar el package.json que está en la raíz
-COPY ../package*.json ./
+# Copiamos el package.json desde la raíz
+COPY package*.json ./
 
-# Instalamos las librerías
+# Instalamos librerías
 RUN npm install
 
-# Copiamos todo el contenido de la carpeta backend
+# ¡ESTA ES LA LÍNEA CLAVE! 
+# Copia el CONTENIDO de backend directamente a /app
 COPY backend/. .
 
 EXPOSE 10000
 
-# Arrancamos el servidor
+# Ahora sí encontrará el archivo server.js en la raíz de /app
 CMD ["node", "server.js"]
