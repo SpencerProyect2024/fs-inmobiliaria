@@ -3,17 +3,16 @@ FROM ghcr.io/puppeteer/puppeteer:latest
 USER root
 WORKDIR /app
 
-# Copiamos archivos de dependencias
-COPY package*.json ./
+# Subimos un nivel para copiar el package.json que está en la raíz
+COPY ../package*.json ./
 
-# Instalamos las librerías de Node
+# Instalamos las librerías
 RUN npm install
 
-# Copiamos el resto de tu código de la carpeta backend
+# Copiamos todo el contenido de la carpeta backend
 COPY . .
 
-# Puerto para Render
 EXPOSE 10000
 
-# IMPORTANTE: Usamos server.js que es como se llama tu archivo en GitHub
+# Arrancamos el servidor
 CMD ["node", "server.js"]
