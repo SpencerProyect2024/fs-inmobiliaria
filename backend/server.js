@@ -20,16 +20,23 @@ const PORT = process.env.PORT || 10000;
 ================================ */
 
 app.use(cors({
-  origin: [
-    "https://creative-marigold-466670.netlify.app", 
-    "https://fs-inmobiliaria.vercel.app"
-  ],
+  origin: function (origin, callback) {
+    // Permitir si no hay origen (como Postman) o si viene de Vercel o Netlify
+    if (!origin || 
+        origin.includes('vercel.app') || 
+        origin.includes('netlify.app') || 
+        origin === "https://fs-inmobiliaria.vercel.app") {
+      callback(null, true);
+    } else {
+      callback(new Error('No permitido por CORS'));
+    }
+  },
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true
 }));
 
-// Preflight
+// Esto es vital para las "Preflight requests"
 app.options("*", cors());
 
 
