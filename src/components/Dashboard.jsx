@@ -150,11 +150,13 @@ const Dashboard = ({ user, onLogout }) => {
 
   // ✅ LOGICA DE NOTIFICACION UNIDA
   const handleSendWhatsApp = () => {
+    // 1. Validamos que haya datos mínimos
     if (!formData.nombre_completo || !formData.telefono) {
       setMessage('⚠️ Completa el nombre y teléfono del cliente primero');
       return;
     }
 
+    // 2. Redactamos el mensaje profesional
     const mensaje = 
       `*🔔 NUEVA CITA AGENDADA - F&S*\n\n` +
       `👤 *Cliente:* ${formData.nombre_completo}\n` +
@@ -164,12 +166,15 @@ const Dashboard = ({ user, onLogout }) => {
       `📅 *Cita:* ${formData.cita_agendada || 'Por confirmar'}\n\n` +
       `_Enviado desde el Sistema de Gestión F&S_`;
 
-    // Abrir WhatsApp directamente desde el navegador del asesor
+    // 3. Abrimos la ventana emergente de WhatsApp directamente
+    // Usamos el Jefe 1 por defecto
     const url = `https://wa.me/${NUMERO_JEFE_1}?text=${encodeURIComponent(mensaje)}`;
     window.open(url, '_blank');
     
-    setMessage('✅ Notificación abierta en WhatsApp');
+    setMessage('✅ Ventana de WhatsApp abierta');
   };
+
+  
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!validateForm()) return
