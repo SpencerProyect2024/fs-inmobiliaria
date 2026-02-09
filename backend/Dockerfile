@@ -10,7 +10,7 @@ COPY ../package*.json ./
 RUN npm install
 
 # Copiamos todo el contenido de la carpeta backend
-COPY . .
+COPY backend/. .
 
 EXPOSE 10000
 
