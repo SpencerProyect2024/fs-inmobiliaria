@@ -28,7 +28,7 @@ const client = new Client({
     authStrategy: new LocalAuth({ clientId: "session-fs" }),
     puppeteer: {
         headless: true,
-        executablePath: '/usr/bin/google-chrome-stable',
+         executablePath: '/usr/bin/google-chrome-stable', // Prueba con esta primer
         args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
