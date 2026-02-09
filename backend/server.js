@@ -46,21 +46,33 @@ app.use(express.json());
 ================================ */
 
 const client = new Client({
-  // Quita LocalAuth momentáneamente para que el QR salga sin pesar tanto
-  puppeteer: {
-    headless: true,
-    args: [
-      "--no-sandbox",
-      "--disable-setuid-sandbox",
-      "--disable-dev-shm-usage",
-      "--disable-accelerated-2d-canvas",
-      "--no-first-run",
-      "--no-zygote",
-      "--single-process", // ESTO ES VITAL para ahorrar RAM en Render
-      "--disable-gpu"
-    ]
-  }
+    authStrategy: new LocalAuth(),
+    puppeteer: {
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    }
 });
+
+// ESTO ES LO QUE DEBES AGREGAR:
+client.on('qr', (qr) => {
+    // Ya no necesitamos el QR, pero lo dejamos por si acaso
+    console.log('QR RECIBIDO, pero usaremos código de emparejamiento...');
+});
+
+// Lógica para generar el código de 8 dígitos
+client.on('ready', () => {
+    console.log('✅ WhatsApp conectado correctamente');
+});
+
+client.initialize();
+
+// AGREGA ESTO AL FINAL O DESPUÉS DE INITIALIZE
+// Sustituye 'tu_numero' por tu número con código de país (ej: 54911...)
+setTimeout(async () => {
+    const code = await client.requestPairingCode('TU_NUMERO_DE_TELEFONO_CON_CODIGO_PAIS');
+    console.log('---------------------------------');
+    console.log('TU CÓDIGO DE VINCULACIÓN ES:', code);
+    console.log('---------------------------------');
+}, 5000);
 
 client.on("qr", (qr) => {
   console.log("⚠️ Escanea el QR:");
