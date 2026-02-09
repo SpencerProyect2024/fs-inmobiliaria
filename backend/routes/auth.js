@@ -5,11 +5,9 @@ import pool from '../db.js';
 
 const router = express.Router();
 
-
 /* ===============================
    TEST LOGIN (PARA DEBUG)
 ================================ */
-
 router.post('/login-test', (req, res) => {
   res.json({
     success: true,
@@ -17,18 +15,13 @@ router.post('/login-test', (req, res) => {
   });
 });
 
-
 /* ===============================
    LOGIN REAL
 ================================ */
-
 router.post('/login', async (req, res) => {
   try {
-
     const { email, password } = req.body;
-
-    console.log('Login attempt:', email); // DEBUG
-
+    console.log('Login attempt:', email); 
 
     if (!email || !password) {
       return res.status(400).json({
@@ -37,41 +30,24 @@ router.post('/login', async (req, res) => {
       });
     }
 
-
-    const connection = await pool.getConnection();
-    console.log('DB connected'); // DEBUG
-    
-
-    const [users] = await connection.query(
-      'SELECT * FROM usuarios WHERE email = ?',
+    // ✅ CAMBIO PARA POSTGRES: Usamos pool.query directamente y $1 en vez de ?
+    const result = await pool.query(
+      'SELECT * FROM usuarios WHERE email = $1',
       [email]
     );
 
-
-    console.log('Users found:', users.length); // DEBUG
-
-    connection.release();
-
+    const users = result.rows; // Postgres devuelve las filas en .rows
+    console.log('Users found:', users.length);
 
     if (users.length === 0) {
-      console.log('User not found'); // DEBUG
-
       return res.status(401).json({
         success: false,
         message: 'Credenciales inválidas'
       });
     }
 
-
     const user = users[0];
-
-    console.log('Password hash:', user.password); // DEBUG
-    
-
     const validPassword = await bcrypt.compare(password, user.password);
-
-    console.log('Password valid:', validPassword); // DEBUG
-
 
     if (!validPassword) {
       return res.status(401).json({
@@ -80,13 +56,11 @@ router.post('/login', async (req, res) => {
       });
     }
 
-
     const token = jwt.sign(
       { id: user.id, email: user.email },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRE }
     );
-
 
     res.json({
       success: true,
@@ -99,11 +73,8 @@ router.post('/login', async (req, res) => {
       token
     });
 
-
   } catch (error) {
-
-    console.error(error);
-
+    console.error('Error en Login:', error);
     res.status(500).json({
       success: false,
       message: 'Error en el servidor'
@@ -111,16 +82,12 @@ router.post('/login', async (req, res) => {
   }
 });
 
-
 /* ===============================
    REGISTRO
 ================================ */
-
 router.post('/register', async (req, res) => {
   try {
-
     const { nombre, email, password } = req.body;
-
 
     if (!nombre || !email || !password) {
       return res.status(400).json({
@@ -129,49 +96,29 @@ router.post('/register', async (req, res) => {
       });
     }
 
-
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const connection = await pool.getConnection();
-    
+    // ✅ CAMBIO PARA POSTGRES: Usamos $1, $2, $3 y pool.query
+    await pool.query(
+      'INSERT INTO usuarios (nombre, email, password) VALUES ($1, $2, $3)',
+      [nombre, email, hashedPassword]
+    );
 
-    try {
-
-      await connection.query(
-        'INSERT INTO usuarios (nombre, email, password) VALUES (?, ?, ?)',
-        [nombre, email, hashedPassword]
-      );
-
-
-      res.status(201).json({
-        success: true,
-        message: 'Usuario registrado exitosamente'
-      });
-
-
-    } catch (error) {
-
-      if (error.code === 'ER_DUP_ENTRY') {
-
-        return res.status(400).json({
-          success: false,
-          message: 'El email ya está registrado'
-        });
-
-      }
-
-      throw error;
-
-
-    } finally {
-
-      connection.release();
-
-    }
+    res.status(201).json({
+      success: true,
+      message: 'Usuario registrado exitosamente'
+    });
 
   } catch (error) {
-
-    console.error(error);
+    console.error('Error en Registro:', error);
+    
+    // Manejo de duplicados en Postgres
+    if (error.code === '23505') { 
+      return res.status(400).json({
+        success: false,
+        message: 'El email ya está registrado'
+      });
+    }
 
     res.status(500).json({
       success: false,
@@ -179,6 +126,5 @@ router.post('/register', async (req, res) => {
     });
   }
 });
-
 
 export default router;
