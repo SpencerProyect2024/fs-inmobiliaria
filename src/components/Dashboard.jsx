@@ -164,11 +164,11 @@ const Dashboard = ({ user, onLogout }) => {
       `📅 *Cita:* ${formData.cita_agendada || 'Por confirmar'}\n\n` +
       `_Enviado desde el Sistema de Gestión F&S_`;
 
+    // NOTIFICACIÓN DIRECTA (Elimina el 404)
     const url = `https://wa.me/${NUMERO_JEFE_1}?text=${encodeURIComponent(mensaje)}`;
     window.open(url, '_blank');
-    setMessage('✓ Ventana de WhatsApp abierta');
+    setMessage('✅ Ventana de WhatsApp abierta correctamente');
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!validateForm()) return
