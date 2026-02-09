@@ -20,10 +20,13 @@ const PORT = process.env.PORT || 10000;
 ================================ */
 
 app.use(cors({
-  origin: "https://creative-marigold-466670.netlify.app",
+  origin: [
+    "https://creative-marigold-466670.netlify.app", 
+    "https://fs-inmobiliaria.vercel.app"
+  ],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: false
+  credentials: true
 }));
 
 // Preflight
