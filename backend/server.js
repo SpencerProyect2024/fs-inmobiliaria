@@ -46,42 +46,49 @@ app.use(express.json());
 ================================ */
 
 const client = new Client({
-    authStrategy: new LocalAuth({
-        clientId: "client-one" // Esto ayuda a separar sesiones
-    }),
+    authStrategy: new LocalAuth({ clientId: "fs_inmobiliaria_session" }),
     puppeteer: {
         headless: true,
         args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
             '--disable-dev-shm-usage',
-            '--disable-gpu',
-            '--no-first-run',
-            '--no-zygote',
-            '--single-process'
+            '--single-process',
+            '--no-zygote'
         ]
     }
 });
 
-// USAMOS EL EVENTO QR PARA PEDIR EL CÓDIGO SOLO CUANDO EL NAVEGADOR ESTÉ LISTO
+// Variable para evitar múltiples peticiones de código
+let codeRequested = false;
+
 client.on('qr', async (qr) => {
-    console.log('--- NAVEGADOR LISTO, GENERANDO CÓDIGO ---');
-    try {
-        // REEMPLAZA ESTO CON TU NÚMERO REAL
-        const pairingCode = await client.requestPairingCode('5491100000000'); 
-        console.log('****************************************');
-        console.log('TU CÓDIGO DE VINCULACIÓN ES:', pairingCode);
-        console.log('****************************************');
-    } catch (err) {
-        console.log('Error al generar código, reintentando...');
+    if (!codeRequested) {
+        codeRequested = true;
+        console.log('--- ESPERANDO 15 SEG PARA CARGA DE WHATSAPP ---');
+        
+        // Esperamos a que la página cargue realmente antes de pedir el código
+        setTimeout(async () => {
+            try {
+                console.log('--- GENERANDO CÓDIGO DE VINCULACIÓN ---');
+                // REEMPLAZA CON TU NÚMERO (Código país + número sin espacios)
+                const pairingCode = await client.requestPairingCode('573203910334'); 
+                console.log('****************************************');
+                console.log('TU CÓDIGO FINAL ES:', pairingCode);
+                console.log('****************************************');
+            } catch (err) {
+                console.error('Error al generar código:', err.message);
+                codeRequested = false; // Permitir reintento si falla
+            }
+        }, 15000); // 15 segundos de margen de seguridad
     }
 });
 
 client.on('ready', () => {
-    console.log('✅ WhatsApp conectado correctamente');
+    console.log('✅ CONEXIÓN EXITOSA: WhatsApp está activo.');
 });
 
-client.initialize().catch(err => console.error("Error al inicializar:", err));
+client.initialize().catch(err => console.error("Fallo crítico al iniciar:", err));
 
 // AGREGA ESTO AL FINAL O DESPUÉS DE INITIALIZE
 // Sustituye 'tu_numero' por tu número con código de país (ej: 54911...)
