@@ -149,32 +149,26 @@ const Dashboard = ({ user, onLogout }) => {
   };
 
   // ✅ LOGICA DE NOTIFICACION UNIDA
-  const handleSendWhatsApp = () => {
-    // 1. Validamos que haya datos mínimos
-    if (!formData.nombre_completo || !formData.telefono) {
-      setMessage('⚠️ Completa el nombre y teléfono del cliente primero');
-      return;
-    }
+const handleSendWhatsApp = () => {
+  if (!formData.nombre_completo || !formData.telefono) {
+    setMessage('⚠️ Completa el nombre y teléfono del cliente primero');
+    return;
+  }
 
-    // 2. Redactamos el mensaje profesional
-    const mensaje = 
-      `*🔔 NUEVA CITA AGENDADA - F&S*\n\n` +
-      `👤 *Cliente:* ${formData.nombre_completo}\n` +
-      `📞 *Teléfono:* ${formData.telefono}\n` +
-      `🏗️ *Proyecto:* ${formData.proyecto || 'No especificado'}\n` +
-      `📍 *Lote:* ${formData.lote || 'N/A'} (Mza: ${formData.manzana || 'N/A'})\n` +
-      `📅 *Cita:* ${formData.cita_agendada || 'Por confirmar'}\n\n` +
-      `_Enviado desde el Sistema de Gestión F&S_`;
+  const mensaje = 
+    `*🔔 NUEVA CITA AGENDADA - F&S*\n\n` +
+    `👤 *Cliente:* ${formData.nombre_completo}\n` +
+    `📞 *Teléfono:* ${formData.telefono}\n` +
+    `🏗️ *Proyecto:* ${formData.proyecto || 'No especificado'}\n` +
+    `📅 *Cita:* ${formData.cita_agendada || 'Por confirmar'}\n\n` +
+    `_Enviado desde el Sistema F&S_`;
 
-    // 3. Abrimos la ventana emergente de WhatsApp directamente
-    // Usamos el Jefe 1 por defecto
-    const url = `https://wa.me/${NUMERO_JEFE_1}?text=${encodeURIComponent(mensaje)}`;
-    window.open(url, '_blank');
-    
-    setMessage('✅ Ventana de WhatsApp abierta');
-  };
+  // LA CLAVE: Esto no usa el servidor, por eso no puede dar error 404
+  const url = `https://wa.me/573142610308?text=${encodeURIComponent(mensaje)}`;
+  window.open(url, '_blank');
+  setMessage('✅ WhatsApp abierto');
+};
 
-  
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!validateForm()) return
