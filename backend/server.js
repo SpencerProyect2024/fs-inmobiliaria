@@ -40,7 +40,7 @@ app.use(express.json());
 
 let codeRequested = false;*/
 
-client.on('qr', async (qr) => {
+/*client.on('qr', async (qr) => {
     if (!codeRequested) {
         codeRequested = true;
         console.log('--- ESPERANDO 15 SEG PARA CARGA DE WHATSAPP ---');
@@ -61,7 +61,7 @@ client.on('qr', async (qr) => {
 
 client.on('ready', () => {
     console.log('✅ CONEXIÓN EXITOSA: WhatsApp está activo.');
-});
+});*/
 
 /* ===============================
     ROUTES
