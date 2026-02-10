@@ -31,8 +31,6 @@ const Dashboard = ({ user, onLogout }) => {
     telefono: '',       
     correo: '',         
     cita_agendada: '',  
-    nombre_empresa: '',
-    origen_cliente: '', 
     proyecto: '',
     manzana: '',
     lote: '',
@@ -182,12 +180,16 @@ const Dashboard = ({ user, onLogout }) => {
     setLoading(true)
     setMessage('')
 
-    // OBJETO LIMPIO PARA EVITAR ERROR 500
+    // OBJETO FILTRADO: Solo enviamos los campos que existen en la DB
     const payload = {
-        ...formData,
+        nombre_completo: formData.nombre_completo,
         telefono: formData.telefono || "",
         correo: formData.correo || "",
         cita_agendada: formData.cita_agendada || "",
+        proyecto: formData.proyecto,
+        manzana: formData.manzana,
+        lote: formData.lote,
+        estado_lote: formData.estado_lote,
         precio_total: Number(formData.precio_total),
         enganche_porcentaje: Number(formData.enganche_porcentaje),
         tasa_interes: Number(formData.tasa_interes),
@@ -206,9 +208,8 @@ const Dashboard = ({ user, onLogout }) => {
       loadLotes()
       setFormData({
         nombre_completo: '', telefono: '', correo: '', cita_agendada: '',
-        nombre_empresa: '', origen_cliente: '', proyecto: '', manzana: '',
-        lote: '', estado_lote: 'disponible', precio_total: '',
-        enganche_porcentaje: 1000000, tasa_interes: 4000000, cuota_mensual: 0,
+        proyecto: '', manzana: '', lote: '', estado_lote: 'disponible', 
+        precio_total: '', enganche_porcentaje: 1000000, tasa_interes: 4000000, cuota_mensual: 0,
       })
     } catch (err) {
       console.error("Error detallado:", err.response?.data);
@@ -298,20 +299,9 @@ const Dashboard = ({ user, onLogout }) => {
                     <input type="email" style={inputStyle} value={formData.correo} onChange={(e) => handleInputChange('correo', e.target.value)} />
                   </div>
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '12px' }}>
-                  <div style={formGroupStyle}>
-                    <label style={labelStyle}>Canal de Origen</label>
-                    <select style={selectStyle} value={formData.origen_cliente} onChange={(e) => handleInputChange('origen_cliente', e.target.value)}>
-                      <option value="">Seleccionar...</option>
-                      <option value="Web">Web</option>
-                      <option value="Publicidad">Publicidad</option>
-                      <option value="Referencia">Referencia</option>
-                    </select>
-                  </div>
-                  <div style={formGroupStyle}>
+                <div style={formGroupStyle}>
                     <label style={labelStyle}>Agendar Cita</label>
                     <input type="datetime-local" style={inputStyle} value={formData.cita_agendada} onChange={(e) => handleInputChange('cita_agendada', e.target.value)} />
-                  </div>
                 </div>
               </div>
 
