@@ -180,7 +180,7 @@ const Dashboard = ({ user, onLogout }) => {
     setLoading(true)
     setMessage('')
 
-    // OBJETO FILTRADO: Solo enviamos los campos que existen en la DB
+    // --- CORRECCIÓN CRÍTICA: PAYLOAD LIMPIO ---
     const payload = {
         nombre_completo: formData.nombre_completo,
         telefono: formData.telefono || "",
@@ -299,9 +299,11 @@ const Dashboard = ({ user, onLogout }) => {
                     <input type="email" style={inputStyle} value={formData.correo} onChange={(e) => handleInputChange('correo', e.target.value)} />
                   </div>
                 </div>
-                <div style={formGroupStyle}>
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '12px' }}>
+                  <div style={formGroupStyle}>
                     <label style={labelStyle}>Agendar Cita</label>
                     <input type="datetime-local" style={inputStyle} value={formData.cita_agendada} onChange={(e) => handleInputChange('cita_agendada', e.target.value)} />
+                  </div>
                 </div>
               </div>
 

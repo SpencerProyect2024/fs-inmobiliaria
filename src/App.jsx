@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import Login from "./components/login";
 import Dashboard from './components/Dashboard'
-import ConsultaPublica from './pages/ConsultaPublica' // Importación de la nueva página
+import ConsultaPublica from './pages/ConsultaPublica' // Importación necesaria
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('token'))
@@ -23,10 +23,10 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* RUTA PÚBLICA: Se puede ver sin estar logueado */}
+        {/* Mantenemos tu lógica exacta: Si es /consulta, muestra la página pública */}
         <Route path="/consulta" element={<ConsultaPublica />} />
 
-        {/* RUTA PRINCIPAL: Maneja el Login y el Dashboard */}
+        {/* Mantenemos tu lógica exacta de autenticación en la raíz */}
         <Route 
           path="/" 
           element={
@@ -38,7 +38,7 @@ function App() {
           } 
         />
 
-        {/* Redirección por si escriben cualquier otra cosa */}
+        {/* Redirección de seguridad para rutas no existentes */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>
