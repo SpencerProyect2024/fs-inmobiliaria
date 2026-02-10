@@ -184,7 +184,6 @@ const Dashboard = ({ user, onLogout }) => {
     setLoading(true)
     setMessage('')
     try {
-      // AQUÍ SE ENVIAN TODOS LOS PARÁMETROS DEL FORMDATA
       if (editingId) {
         await api.put(`/lotes/${editingId}`, formData)
         setMessage('✓ Lote actualizado exitosamente')
@@ -235,7 +234,7 @@ const Dashboard = ({ user, onLogout }) => {
   const buttonBlueStyle = { padding: '14px', backgroundColor: '#24303c', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }
   const buttonWhiteStyle = { ...buttonBlueStyle, backgroundColor: '#fff', color: '#24303c', border: '2px solid #24303c' }
   const buttonGreenStyle = { ...buttonBlueStyle, backgroundColor: '#22c55e' }
-  const tableStyle = { width: '100%', borderCollapse: 'collapse', marginTop: '20px', minWidth: isMobile ? '600px' : 'auto' }
+  const tableStyle = { width: '100%', borderCollapse: 'collapse', marginTop: '20px', minWidth: isMobile ? '700px' : 'auto' }
 
   return (
     <div style={containerStyle}>
@@ -378,6 +377,7 @@ const Dashboard = ({ user, onLogout }) => {
                   <thead style={{backgroundColor: '#24303c', color: '#fff'}}>
                     <tr>
                       <th style={{padding: '12px', textAlign: 'left'}}>Nombre</th>
+                      <th style={{padding: '12px', textAlign: 'left'}}>Contacto</th>
                       <th style={{padding: '12px', textAlign: 'left'}}>Proyecto</th>
                       <th style={{padding: '12px', textAlign: 'left'}}>Ubicación</th>
                       <th style={{padding: '12px', textAlign: 'left'}}>Precio</th>
@@ -388,6 +388,10 @@ const Dashboard = ({ user, onLogout }) => {
                     {lotes.map(lote => (
                       <tr key={lote.id} style={{borderBottom: '1px solid #ddd'}}>
                         <td style={{padding: '12px'}}>{lote.nombre_completo}</td>
+                        <td style={{padding: '12px', fontSize: '12px'}}>
+                          <div>📞 {lote.telefono}</div>
+                          <div style={{color: '#666'}}>{lote.correo || 'Sin correo'}</div>
+                        </td>
                         <td style={{padding: '12px'}}>{lote.proyecto}</td>
                         <td style={{padding: '12px'}}>M: {lote.manzana} / L: {lote.lote}</td>
                         <td style={{padding: '12px'}}>${parseFloat(lote.precio_total).toLocaleString('es-CO')}</td>
