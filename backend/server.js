@@ -24,7 +24,7 @@ app.use(express.json());
 /* ===============================
     WHATSAPP CONFIG
 ================================ */
-const client = new Client({
+/*const client = new Client({
     authStrategy: new LocalAuth({ clientId: "session-fs" }),
     puppeteer: {
         headless: true,
@@ -38,7 +38,7 @@ const client = new Client({
     }
 });
 
-let codeRequested = false;
+let codeRequested = false;*/
 
 client.on('qr', async (qr) => {
     if (!codeRequested) {
