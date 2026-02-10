@@ -9,7 +9,7 @@ import autoTable from 'jspdf-autotable';
 const NUMERO_JEFE_1 = "573142610308"; 
 const NUMERO_JEFE_2 = "573222901786"; 
 
-// --- LISTA DE PROYECTOS INTEGRADA ---
+// --- LISTA DE PROYECTOS ---
 const proyectosFS = [
   "PROYECTO LAS RAMBLAS",
   "PROYECTO EL OASIS PARCELACIÓN EL OLIMPO",
@@ -47,8 +47,6 @@ const Dashboard = ({ user, onLogout }) => {
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
   const [editingId, setEditingId] = useState(null)
-
-  // --- LÓGICA RESPONSIVE ---
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
   useEffect(() => {
@@ -183,12 +181,25 @@ const Dashboard = ({ user, onLogout }) => {
     if (!validateForm()) return
     setLoading(true)
     setMessage('')
+
+    // OBJETO LIMPIO PARA EVITAR ERROR 500
+    const payload = {
+        ...formData,
+        telefono: formData.telefono || "",
+        correo: formData.correo || "",
+        cita_agendada: formData.cita_agendada || "",
+        precio_total: Number(formData.precio_total),
+        enganche_porcentaje: Number(formData.enganche_porcentaje),
+        tasa_interes: Number(formData.tasa_interes),
+        cuota_mensual: Number(formData.cuota_mensual)
+    };
+
     try {
       if (editingId) {
-        await api.put(`/lotes/${editingId}`, formData)
+        await api.put(`/lotes/${editingId}`, payload)
         setMessage('✓ Lote actualizado exitosamente')
       } else {
-        await api.post('/lotes', formData)
+        await api.post('/lotes', payload)
         setMessage('✓ Lote guardado exitosamente')
       }
       setEditingId(null)
@@ -200,11 +211,16 @@ const Dashboard = ({ user, onLogout }) => {
         enganche_porcentaje: 1000000, tasa_interes: 4000000, cuota_mensual: 0,
       })
     } catch (err) {
+      console.error("Error detallado:", err.response?.data);
       setMessage('✗ Error: ' + (err.response?.data?.message || err.message))
     } finally { setLoading(false) }
   }
 
-  const handleEdit = (lote) => { setEditingId(lote.id); setFormData({ ...lote }); }
+  const handleEdit = (lote) => { 
+    setEditingId(lote.id); 
+    setFormData({ ...lote }); 
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 
   const handleDelete = async (id) => {
     if (confirm('¿Deseas eliminar este lote?')) {
@@ -216,7 +232,7 @@ const Dashboard = ({ user, onLogout }) => {
     }
   }
 
-  // --- ESTILOS MEJORADOS (RESPONSIVE) ---
+  // --- ESTILOS ---
   const containerStyle = { minHeight: '100vh', backgroundColor: '#e5e7eb', padding: isMobile ? '10px' : '20px' }
   const cardStyle = { maxWidth: '1400px', margin: '0 auto', backgroundColor: '#fff', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)', overflow: 'hidden' }
   const navStyle = { backgroundColor: '#24303c', color: '#fff', padding: isMobile ? '15px' : '12px 30px', display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', alignItems: 'center', borderBottom: '3px solid #d4af37', gap: isMobile ? '10px' : '0' }
@@ -389,7 +405,7 @@ const Dashboard = ({ user, onLogout }) => {
                       <tr key={lote.id} style={{borderBottom: '1px solid #ddd'}}>
                         <td style={{padding: '12px'}}>{lote.nombre_completo}</td>
                         <td style={{padding: '12px', fontSize: '12px'}}>
-                          <div>📞 {lote.telefono}</div>
+                          <div>📞 {lote.telefono || 'Sin tel'}</div>
                           <div style={{color: '#666'}}>{lote.correo || 'Sin correo'}</div>
                         </td>
                         <td style={{padding: '12px'}}>{lote.proyecto}</td>
