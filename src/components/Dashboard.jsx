@@ -148,26 +148,31 @@ const Dashboard = ({ user, onLogout }) => {
     }
   };
 
-  // ✅ LOGICA DE NOTIFICACION UNIDA
-const handleSendWhatsApp = () => {
-  if (!formData.nombre_completo || !formData.telefono) {
-    setMessage('⚠️ Completa el nombre y teléfono del cliente primero');
-    return;
-  }
+  // ✅ LOGICA DE NOTIFICACION CORREGIDA PARA ENVIAR TODOS LOS DATOS
+  const handleSendWhatsApp = () => {
+    if (!formData.nombre_completo || !formData.telefono) {
+      setMessage('⚠️ Completa el nombre y teléfono del cliente primero');
+      return;
+    }
 
-  const mensaje = 
-    `*🔔 NUEVA CITA AGENDADA - F&S*\n\n` +
-    `👤 *Cliente:* ${formData.nombre_completo}\n` +
-    `📞 *Teléfono:* ${formData.telefono}\n` +
-    `🏗️ *Proyecto:* ${formData.proyecto || 'No especificado'}\n` +
-    `📅 *Cita:* ${formData.cita_agendada || 'Por confirmar'}\n\n` +
-    `_Enviado desde el Sistema F&S_`;
+    const mensaje = 
+      `*🔔 NUEVA NOTIFICACIÓN DE VENTA - F&S*\n\n` +
+      `👤 *Cliente:* ${formData.nombre_completo}\n` +
+      `📞 *Teléfono:* ${formData.telefono}\n` +
+      `📧 *Correo:* ${formData.correo || 'N/A'}\n` +
+      `🏗️ *Proyecto:* ${formData.proyecto || 'No especificado'}\n` +
+      `📍 *Ubicación:* Mza ${formData.manzana || '0'} - Lote ${formData.lote || '0'}\n` +
+      `📅 *Cita Agendada:* ${formData.cita_agendada || 'Por confirmar'}\n` +
+      `💰 *Precio Total:* $${parseFloat(formData.precio_total || 0).toLocaleString('es-CO')}\n` +
+      `💵 *Separación:* $${parseFloat(formData.enganche_porcentaje || 0).toLocaleString('es-CO')}\n` +
+      `📝 *Cuota Promesa:* $${parseFloat(formData.tasa_interes || 0).toLocaleString('es-CO')}\n` +
+      `💳 *Cuota Mensual (36m):* $${parseFloat(formData.cuota_mensual || 0).toLocaleString('es-CO')}\n\n` +
+      `_Enviado desde el Sistema de Gestión F&S_`;
 
-  // LA CLAVE: Esto no usa el servidor, por eso no puede dar error 404
-  const url = `https://wa.me/573142610308?text=${encodeURIComponent(mensaje)}`;
-  window.open(url, '_blank');
-  setMessage('✅ WhatsApp abierto');
-};
+    const url = `https://wa.me/${NUMERO_JEFE_1}?text=${encodeURIComponent(mensaje)}`;
+    window.open(url, '_blank');
+    setMessage('✅ WhatsApp enviado a Jefe 1');
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -207,7 +212,7 @@ const handleSendWhatsApp = () => {
     }
   }
 
-  // --- ESTILOS EXACTOS ---
+  // --- ESTILOS ---
   const containerStyle = { minHeight: '100vh', backgroundColor: '#e5e7eb', padding: '20px' }
   const cardStyle = { maxWidth: '1400px', margin: '0 auto', backgroundColor: '#fff', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)', overflow: 'hidden' }
   const navStyle = { backgroundColor: '#24303c', color: '#fff', padding: '12px 30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '3px solid #d4af37' }
@@ -257,7 +262,6 @@ const handleSendWhatsApp = () => {
 
           <form onSubmit={handleSubmit}>
             <div style={gridStyle}>
-              {/* SECCIÓN 1: CONTACTO */}
               <div style={sectionStyle}>
                 <h3 style={sectionTitleStyle}>DATOS DE CONTACTO Y PROSPECTO</h3>
                 <div style={formGroupStyle}>
@@ -291,7 +295,6 @@ const handleSendWhatsApp = () => {
                 </div>
               </div>
 
-              {/* SECCIÓN 2: LOTE */}
               <div style={sectionStyle}>
                 <h3 style={sectionTitleStyle}>DETALLES TÉCNICOS DEL LOTE</h3>
                 <div style={formGroupStyle}>
@@ -327,7 +330,6 @@ const handleSendWhatsApp = () => {
               </div>
             </div>
 
-            {/* SECCIÓN 3: SIMULADOR */}
             <div style={simulatorStyle}>
               <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '20px' }}>SIMULADOR FINANCIERO</h3>
               <div style={simulatorGridStyle}>
@@ -350,7 +352,6 @@ const handleSendWhatsApp = () => {
               </div>
             </div>
 
-            {/* BOTONES DE ACCIÓN */}
             <div style={buttonsStyle}>
               <button type="submit" style={buttonBlueStyle} disabled={loading}>
                 <Save size={18} /> {editingId ? 'ACTUALIZAR' : 'GUARDAR EN BD'}
@@ -364,7 +365,6 @@ const handleSendWhatsApp = () => {
             </div>
           </form>
 
-          {/* TABLA DE RESULTADOS */}
           {lotes.length > 0 && (
             <div>
               <h3 style={sectionTitleStyle}>LOTES REGISTRADOS</h3>
