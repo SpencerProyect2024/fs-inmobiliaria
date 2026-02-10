@@ -2,7 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 
-// 1. Rutas
+// MANTENEMOS TUS RUTAS ORIGINALES (Aquí está la lógica de lotes y login)
 import authRoutes from "./routes/auth.js";
 import lotesRoutes from "./routes/lotes.js";
 
@@ -11,7 +11,7 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 10000;
 
-// 2. Middleware
+// Configuración de CORS
 app.use(cors({
     origin: '*',
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
@@ -20,19 +20,32 @@ app.use(cors({
 
 app.use(express.json());
 
-// 3. Rutas API
+/* =================================================================
+  LOGICA DE WHATSAPP (Mantenemos la variable para que no haya SyntaxError)
+  =================================================================
+*/
+const client = null; // La dejamos como null para que el export de abajo no falle
+
+/* =================================================================
+  TUS RUTAS (NO SE TOCAN, siguen sirviendo para Lotes y Auth)
+  =================================================================
+*/
 app.use("/api/auth", authRoutes);
 app.use("/api/lotes", lotesRoutes);
 
 app.get("/ping", (req, res) => {
-    res.json({ ok: true, message: "Servidor activo" });
+    res.json({ ok: true });
 });
 
-// 4. Inicio del servidor
+/* =================================================================
+  SERVER START
+  =================================================================
+*/
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Server running on port ${PORT}`);
-    console.log(`✅ Base de datos conectada correctamente`);
+    // No llamamos a client.initialize() porque client es null y daría error
 });
 
-// 5. EXPORTACIÓN LIMPIA (Sin la variable 'client' que daba error)
-export default app;
+// ESTO ES LO QUE HACÍA QUE EL SERVER SE CAYERA:
+// Al definir 'client' como null arriba, este export ya no da error.
+export { client };
