@@ -1,10 +1,8 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
-// Comentamos estos para evitar que Node busque librerías que no usaremos en el servidor
-// import pkg from "whatsapp-web.js"; 
-// const { Client, LocalAuth } = pkg;
 
+// 1. Rutas
 import authRoutes from "./routes/auth.js";
 import lotesRoutes from "./routes/lotes.js";
 
@@ -13,7 +11,7 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 10000;
 
-// 🔥 CORS CONFIG
+// 2. Middleware
 app.use(cors({
     origin: '*',
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
@@ -22,30 +20,19 @@ app.use(cors({
 
 app.use(express.json());
 
-/* ===============================
-    WHATSAPP CONFIG (DESACTIVADO PARA RENDER)
-================================ */
-// Si en el futuro usas Docker, puedes volver a activar esto.
-// Por ahora, el Frontend maneja WhatsApp directamente.
-const client = null; 
-
-/* ===============================
-    ROUTES
-================================ */
+// 3. Rutas API
 app.use("/api/auth", authRoutes);
 app.use("/api/lotes", lotesRoutes);
 
 app.get("/ping", (req, res) => {
-    res.json({ ok: true });
+    res.json({ ok: true, message: "Servidor activo" });
 });
 
-/* ===============================
-    SERVER START
-================================ */
+// 4. Inicio del servidor
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Server running on port ${PORT}`);
-    console.log(`💡 WhatsApp logic bypass: Activo (Frontend handling)`);
+    console.log(`✅ Base de datos conectada correctamente`);
 });
 
-// Cambiamos el export para que no falle
-export { client };
+// 5. EXPORTACIÓN LIMPIA (Sin la variable 'client' que daba error)
+export default app;
