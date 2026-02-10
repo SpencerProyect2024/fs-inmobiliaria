@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { LogOut, FileText, MessageCircle, Save, User, Calendar } from 'lucide-react'
+import { LogOut, FileText, MessageCircle, Save, User, Calendar, Menu, X } from 'lucide-react'
 import api from '../services/api'
 import logoInmobiliaria from '../assets/logo1.png'; 
 import jsPDF from 'jspdf';
@@ -48,9 +48,15 @@ const Dashboard = ({ user, onLogout }) => {
   const [message, setMessage] = useState('')
   const [editingId, setEditingId] = useState(null)
 
+  // --- LÓGICA RESPONSIVE ---
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
   useEffect(() => {
-    loadLotes()
-  }, [])
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    loadLotes();
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const loadLotes = async () => {
     try {
@@ -148,13 +154,11 @@ const Dashboard = ({ user, onLogout }) => {
     }
   };
 
-  // ✅ LOGICA DE NOTIFICACION CORREGIDA PARA ENVIAR TODOS LOS DATOS
   const handleSendWhatsApp = () => {
     if (!formData.nombre_completo || !formData.telefono) {
       setMessage('⚠️ Completa el nombre y teléfono del cliente primero');
       return;
     }
-
     const mensaje = 
       `*🔔 NUEVA NOTIFICACIÓN DE VENTA - F&S*\n\n` +
       `👤 *Cliente:* ${formData.nombre_completo}\n` +
@@ -180,6 +184,7 @@ const Dashboard = ({ user, onLogout }) => {
     setLoading(true)
     setMessage('')
     try {
+      // AQUÍ SE ENVIAN TODOS LOS PARÁMETROS DEL FORMDATA
       if (editingId) {
         await api.put(`/lotes/${editingId}`, formData)
         setMessage('✓ Lote actualizado exitosamente')
@@ -212,25 +217,25 @@ const Dashboard = ({ user, onLogout }) => {
     }
   }
 
-  // --- ESTILOS ---
-  const containerStyle = { minHeight: '100vh', backgroundColor: '#e5e7eb', padding: '20px' }
+  // --- ESTILOS MEJORADOS (RESPONSIVE) ---
+  const containerStyle = { minHeight: '100vh', backgroundColor: '#e5e7eb', padding: isMobile ? '10px' : '20px' }
   const cardStyle = { maxWidth: '1400px', margin: '0 auto', backgroundColor: '#fff', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)', overflow: 'hidden' }
-  const navStyle = { backgroundColor: '#24303c', color: '#fff', padding: '12px 30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '3px solid #d4af37' }
-  const contentStyle = { padding: '30px' }
-  const gridStyle = { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px', marginBottom: '30px' }
+  const navStyle = { backgroundColor: '#24303c', color: '#fff', padding: isMobile ? '15px' : '12px 30px', display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', alignItems: 'center', borderBottom: '3px solid #d4af37', gap: isMobile ? '10px' : '0' }
+  const contentStyle = { padding: isMobile ? '15px' : '30px' }
+  const gridStyle = { display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? '20px' : '30px', marginBottom: '30px' }
   const sectionStyle = { display: 'flex', flexDirection: 'column', gap: '16px' }
   const sectionTitleStyle = { fontSize: '16px', fontWeight: 'bold', color: '#333', paddingBottom: '12px', borderBottom: '2px solid #24303c' }
   const formGroupStyle = { display: 'flex', flexDirection: 'column', gap: '6px' }
   const labelStyle = { fontSize: '13px', fontWeight: '600', color: '#555' }
   const inputStyle = { padding: '12px 16px', border: '1px solid #ddd', borderRadius: '8px', fontSize: '14px', fontFamily: 'inherit', boxSizing: 'border-box', width: '100%' }
   const selectStyle = { ...inputStyle, cursor: 'pointer' }
-  const simulatorStyle = { backgroundColor: '#f3f4f6', padding: '24px', borderRadius: '12px', marginBottom: '30px' }
-  const simulatorGridStyle = { display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '16px' }
-  const buttonsStyle = { display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px', marginTop: '30px', marginBottom: '40px' }
+  const simulatorStyle = { backgroundColor: '#f3f4f6', padding: isMobile ? '15px' : '24px', borderRadius: '12px', marginBottom: '30px' }
+  const simulatorGridStyle = { display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr 1fr 1fr', gap: '16px' }
+  const buttonsStyle = { display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr 1fr', gap: '16px', marginTop: '30px', marginBottom: '40px' }
   const buttonBlueStyle = { padding: '14px', backgroundColor: '#24303c', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }
   const buttonWhiteStyle = { ...buttonBlueStyle, backgroundColor: '#fff', color: '#24303c', border: '2px solid #24303c' }
   const buttonGreenStyle = { ...buttonBlueStyle, backgroundColor: '#22c55e' }
-  const tableStyle = { width: '100%', borderCollapse: 'collapse', marginTop: '20px' }
+  const tableStyle = { width: '100%', borderCollapse: 'collapse', marginTop: '20px', minWidth: isMobile ? '600px' : 'auto' }
 
   return (
     <div style={containerStyle}>
@@ -238,11 +243,11 @@ const Dashboard = ({ user, onLogout }) => {
         <div style={navStyle}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <img src={logoInmobiliaria} alt="Logo" style={{ height: '45px', borderRadius: '50%', border: '2px solid #d4af37' }} />
-            <span style={{ fontSize: '20px', fontWeight: 'bold', letterSpacing: '1px' }}>INMOBILIARIA F&S</span>
+            <span style={{ fontSize: isMobile ? '18px' : '20px', fontWeight: 'bold', letterSpacing: '1px' }}>INMOBILIARIA F&S</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }} onClick={onLogout}>
             <User size={20} />
-            <span style={{ fontWeight: '500' }}>Hola, {user?.name || 'Asesor'}</span>
+            <span style={{ fontWeight: '500' }}>{isMobile ? 'Salir' : `Hola, ${user?.name || 'Asesor'}`}</span>
             <LogOut size={18} />
           </div>
         </div>
@@ -268,7 +273,7 @@ const Dashboard = ({ user, onLogout }) => {
                   <label style={labelStyle}>Nombre Completo *</label>
                   <input type="text" style={inputStyle} value={formData.nombre_completo} onChange={(e) => handleInputChange('nombre_completo', e.target.value)} />
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '12px' }}>
                   <div style={formGroupStyle}>
                     <label style={labelStyle}>WhatsApp / Teléfono *</label>
                     <input type="tel" style={inputStyle} value={formData.telefono} onChange={(e) => handleInputChange('telefono', e.target.value)} />
@@ -278,7 +283,7 @@ const Dashboard = ({ user, onLogout }) => {
                     <input type="email" style={inputStyle} value={formData.correo} onChange={(e) => handleInputChange('correo', e.target.value)} />
                   </div>
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '12px' }}>
                   <div style={formGroupStyle}>
                     <label style={labelStyle}>Canal de Origen</label>
                     <select style={selectStyle} value={formData.origen_cliente} onChange={(e) => handleInputChange('origen_cliente', e.target.value)}>
@@ -368,14 +373,14 @@ const Dashboard = ({ user, onLogout }) => {
           {lotes.length > 0 && (
             <div>
               <h3 style={sectionTitleStyle}>LOTES REGISTRADOS</h3>
-              <div style={{ overflowX: 'auto' }}>
+              <div style={{ overflowX: 'auto', border: '1px solid #ddd', borderRadius: '8px' }}>
                 <table style={tableStyle}>
                   <thead style={{backgroundColor: '#24303c', color: '#fff'}}>
                     <tr>
                       <th style={{padding: '12px', textAlign: 'left'}}>Nombre</th>
                       <th style={{padding: '12px', textAlign: 'left'}}>Proyecto</th>
+                      <th style={{padding: '12px', textAlign: 'left'}}>Ubicación</th>
                       <th style={{padding: '12px', textAlign: 'left'}}>Precio</th>
-                      <th style={{padding: '12px', textAlign: 'left'}}>Estado</th>
                       <th style={{padding: '12px', textAlign: 'left'}}>Acciones</th>
                     </tr>
                   </thead>
@@ -384,10 +389,10 @@ const Dashboard = ({ user, onLogout }) => {
                       <tr key={lote.id} style={{borderBottom: '1px solid #ddd'}}>
                         <td style={{padding: '12px'}}>{lote.nombre_completo}</td>
                         <td style={{padding: '12px'}}>{lote.proyecto}</td>
+                        <td style={{padding: '12px'}}>M: {lote.manzana} / L: {lote.lote}</td>
                         <td style={{padding: '12px'}}>${parseFloat(lote.precio_total).toLocaleString('es-CO')}</td>
-                        <td style={{padding: '12px'}}>{lote.estado_lote}</td>
-                        <td style={{padding: '12px'}}>
-                          <button onClick={() => handleEdit(lote)} style={{marginRight: '8px', padding: '6px 12px', backgroundColor: '#3b82f6', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer'}}>Editar</button>
+                        <td style={{padding: '12px', display: 'flex', gap: '8px'}}>
+                          <button onClick={() => handleEdit(lote)} style={{padding: '6px 12px', backgroundColor: '#3b82f6', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer'}}>Editar</button>
                           <button onClick={() => handleDelete(lote.id)} style={{padding: '6px 12px', backgroundColor: '#ef4444', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer'}}>Borrar</button>
                         </td>
                       </tr>
